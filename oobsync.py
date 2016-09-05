@@ -19,7 +19,6 @@ def main():
     # Parses the arguments
     parse_args()
     
-    
     # Connects to the OpenOffice
     oo = OpenOffice()
     
@@ -34,15 +33,15 @@ def parse_args():
     global args
     
     parser = argparse.ArgumentParser(description="Synchronize the local Basic scripts with OpenOffice Basic.")
-    parser.add_argument("action", metavar="action", choices=["checkout", "co", "checkin", "ci"],
-        help="checkout (co) or checkin (ci) the source files.")
     parser.add_argument("library", metavar="Library",
-        help="The Library to checkout/checkin the macros.")
+        help="The Library to upload/download the macros.")
     parser.add_argument("projdir", metavar="dir", nargs="?",
         default=os.getcwd(),
         help="The project source directory (default to the current directory).")
+    parser.add_argument("--get", action="store_true",
+        help="Downloads the macros instead of upload.")
     parser.add_argument("--run", metavar="Module.Macro",
-        help="The macro to run after the checkin, if any.")
+        help="The macro to run after the upload, if any.")
     parser.add_argument("-v", "--version",
         action="version", version="%(prog)s 1.0")
     args = parser.parse_args()
@@ -55,8 +54,16 @@ def sync_macros(oo):
     
     libraries = oo.service_manager.createInstance(
         "com.sun.star.script.ApplicationScriptLibraryContainer")
-    # Checks-in the sources onto OpenOffice
-    if args.action in ["checkin", "ci"]:
+    # Downloads the macros from OpenOffice
+    if args.get:
+        modules = read_basic_modules(libraries, args.library)
+        if len(modules) == 0:
+            print >> sys.stderr, "ERROR: Library " + args.library + " does not exist"
+            return
+        update_source_dir(args.projdir, modules)
+    
+    # Uploads the macros onto OpenOffice
+    else:
         modules = read_in_source_dir(args.projdir)
         if len(modules) == 0:
             print >> sys.stderr, "ERROR: Found no source macros in " + args.projdir
@@ -69,14 +76,6 @@ def sync_macros(oo):
             script = provider.getScript(
                 "vnd.sun.star.script:" + args.library + "." + args.run + "?language=Basic&location=application")
             script.invoke((), (), ())
-    
-    # Checks-out the sources from OpenOffice
-    else:
-        modules = read_basic_modules(libraries, args.library)
-        if len(modules) == 0:
-            print >> sys.stderr, "ERROR: Library " + args.library + " does not exist"
-            return
-        update_source_dir(args.projdir, modules)
     return
 
 def read_in_source_dir(projdir):
