@@ -97,23 +97,27 @@ def update_source_dir(projdir, modules):
         path = os.path.join(projdir, entry)
         if os.path.isfile(path) and entry.lower().endswith(".vb"):
             modname = entry[0:-3]
-            curmods[modname] = True
-            if not modules.has_key(modname):
-                os.remove(path)
-                print >> sys.stderr, modname + ".vb removed."
-            else:
-                f = open(path, "r+")
-                if modules[modname] != f.read():
-                    f.seek(0)
-                    f.write(modules[modname])
-                    print >> sys.stderr, modname + ".vb updated."
-                f.close()
-    for modname in [x for x in modules.keys() if not curmods.has_key(x)]:
-        path = os.path.join(projdir, modname + ".vb")
-        f = open(path, "w")
-        f.write(modules[modname])
-        f.close()
-        print >> sys.stderr, modname + ".vb added."
+            curmods[modname] = entry
+    for modname in sorted(modules.keys()):
+        if not curmods.has_key(modname):
+            path = os.path.join(projdir, modname + ".vb")
+            f = open(path, "w")
+            f.write(modules[modname])
+            f.close()
+            print >> sys.stderr, modname + ".vb added."
+        else:
+            path = os.path.join(projdir, curmods[modname])
+            f = open(path, "r+")
+            if modules[modname] != f.read():
+                f.seek(0)
+                f.write(modules[modname])
+                print >> sys.stderr, curmods[modname] + " updated."
+            f.close()
+    for modname in sorted(curmods.keys()):
+        if not modules.has_key(modname):
+            path = os.path.join(projdir, curmods[modname])
+            os.remove(path)
+            print >> sys.stderr, curmods[modname] + " removed."
     return
 
 def read_basic_modules(libraries, libname):
@@ -132,20 +136,20 @@ def update_basic_modules(libraries, libname, modules):
         libraries.createLibrary(libname)
         print >> sys.stderr, "Library " + libname + " created."
         library = libraries.getByName(libname)
-        for modname in modules.keys():
+        for modname in sorted(modules.keys()):
             library.insertByName(modname, modules[modname])
             print >> sys.stderr, "Module " + modname + " added."
     else:
         library = libraries.getByName(libname)
-        origmods = library.getElementNames()
-        for modname in modules.keys():
-            if not library.hasByName(modname):
+        curmods = sorted(library.getElementNames())
+        for modname in sorted(modules.keys()):
+            if not modname in curmods:
                 library.insertByName(modname, modules[modname])
                 print >> sys.stderr, "Module " + modname + " added."
             elif modules[modname] != library.getByName(modname).encode("utf-8"):
                 library.replaceByName(modname, modules[modname])
                 print >> sys.stderr, "Module " + modname + " updated."
-        for modname in origmods:
+        for modname in curmods:
             if not modules.has_key(modname):
                 library.removeByName(modname)
                 print >> sys.stderr, "Module " + modname + " removed."
