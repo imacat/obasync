@@ -33,18 +33,24 @@ def parse_args():
     global args
     
     parser = argparse.ArgumentParser(description="Synchronize the local Basic scripts with OpenOffice Basic.")
-    parser.add_argument("library", metavar="Library",
-        help="The Library to upload/download the macros.")
     parser.add_argument("projdir", metavar="dir", nargs="?",
         default=os.getcwd(),
         help="The project source directory (default to the current directory).")
+    parser.add_argument("library", metavar="Library", nargs="?",
+        help="The Library to upload/download the macros (default to the name of the directory).")
     parser.add_argument("--get", action="store_true",
         help="Downloads the macros instead of upload.")
-    parser.add_argument("--run", metavar="Module.Macro",
+    parser.add_argument("-r", "--run", metavar="Module.Macro",
         help="The macro to run after the upload, if any.")
     parser.add_argument("-v", "--version",
-        action="version", version="%(prog)s 1.0")
+        action="version", version="%(prog)s 0.1")
     args = parser.parse_args()
+    
+    # Obtains the absolute path
+    args.projdir = os.path.abspath(args.projdir)
+    # Obtains the library name from the path
+    if args.library == None:
+        args.library = os.path.basename(args.projdir)
     
     return
 
@@ -125,6 +131,7 @@ def read_basic_modules(libraries, libname):
     modules = {}
     if not libraries.hasByName(libname):
         return modules
+    libraries.loadLibrary(libname)
     library = libraries.getByName(libname)
     for modname in library.getElementNames():
         modules[modname] = library.getByName(modname).encode("utf-8")
@@ -140,6 +147,7 @@ def update_basic_modules(libraries, libname, modules):
             library.insertByName(modname, modules[modname])
             print >> sys.stderr, "Module " + modname + " added."
     else:
+        libraries.loadLibrary(libname)
         library = libraries.getByName(libname)
         curmods = sorted(library.getElementNames())
         for modname in sorted(modules.keys()):
