@@ -161,6 +161,8 @@ def update_basic_modules(libraries, libname, modules):
             if not modules.has_key(modname):
                 library.removeByName(modname)
                 print >> sys.stderr, "Module " + modname + " removed."
+    if libraries.isModified():
+        libraries.storeLibraries()
     return
 
 class OpenOffice:
