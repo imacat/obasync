@@ -130,6 +130,7 @@ def read_in_source_dir(projdir):
 def update_source_dir(projdir, modules):
     """ Updates the source macros. """
     curmods = {}
+    is_in_sync = True
     for entry in os.listdir(projdir):
         path = os.path.join(projdir, entry)
         if os.path.isfile(path) and entry.lower().endswith(".vb"):
@@ -142,6 +143,7 @@ def update_source_dir(projdir, modules):
             f.write(modules[modname])
             f.close()
             print >> sys.stderr, modname + ".vb added."
+            is_in_sync = False
         else:
             path = os.path.join(projdir, curmods[modname])
             f = open(path, "r+")
@@ -149,12 +151,16 @@ def update_source_dir(projdir, modules):
                 f.seek(0)
                 f.write(modules[modname])
                 print >> sys.stderr, curmods[modname] + " updated."
+                is_in_sync = False
             f.close()
     for modname in sorted(curmods.keys()):
         if modname not in modules:
             path = os.path.join(projdir, curmods[modname])
             os.remove(path)
             print >> sys.stderr, curmods[modname] + " removed."
+            is_in_sync = False
+    if is_in_sync:
+        print >> sys.stderr, "Everything is in sync."
     return
 
 
@@ -197,6 +203,8 @@ def update_basic_modules(libraries, libname, modules, oo):
                 print >> sys.stderr, "Module " + modname + " removed."
     if libraries.isModified():
         libraries.storeLibraries()
+    else:
+        print >> sys.stderr, "Everything is in sync."
     return
 
 
