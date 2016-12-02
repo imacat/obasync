@@ -121,7 +121,8 @@ def read_in_source_dir(projdir):
         if os.path.isfile(path) and entry.lower().endswith(".vb"):
             modname = entry[0:-3]
             f = open(path)
-            modules[modname] = f.read().decode("utf-8")
+            modules[modname] = f.read().decode("utf-8").replace(
+                "\r\n", "\n")
             f.close()
     return modules
 
@@ -144,7 +145,7 @@ def update_source_dir(projdir, modules):
         else:
             path = os.path.join(projdir, curmods[modname])
             f = open(path, "r+")
-            if modules[modname] != f.read():
+            if modules[modname] != f.read().replace("\r\n", "\n"):
                 f.seek(0)
                 f.write(modules[modname])
                 print >> sys.stderr, curmods[modname] + " updated."
