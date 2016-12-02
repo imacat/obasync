@@ -99,8 +99,7 @@ def sync_macros(oo):
             print >> sys.stderr, \
                 "ERROR: Found no source macros in " + args.projdir
             return
-        update_basic_modules(libraries, args.library, modules)
-        check_dialog_library(oo, args.library)
+        update_basic_modules(libraries, args.library, modules, oo)
         if args.run is not None:
             factory = oo.service_manager.DefaultContext.getByName(
                 "/singletons/com.sun.star.script.provider."
@@ -171,11 +170,12 @@ def read_basic_modules(libraries, libname):
     return modules
 
 
-def update_basic_modules(libraries, libname, modules):
+def update_basic_modules(libraries, libname, modules, oo):
     """ Updates the OpenOffice Basic macros storage. """
     if not libraries.hasByName(libname):
         libraries.createLibrary(libname)
         print >> sys.stderr, "Script library " + libname + " created."
+        create_dialog_library(oo, libname)
         library = libraries.getByName(libname)
         for modname in sorted(modules.keys()):
             library.insertByName(modname, modules[modname])
@@ -200,14 +200,13 @@ def update_basic_modules(libraries, libname, modules):
     return
 
 
-def check_dialog_library(oo, libname):
-    """ Checks and adds the dialog library when missing. """
+def create_dialog_library(oo, libname):
+    """ Creates the dialog library. """
     libraries = oo.service_manager.createInstance(
         "com.sun.star.script.ApplicationDialogLibraryContainer")
-    if not libraries.hasByName(libname):
-        libraries.createLibrary(libname)
-        print >> sys.stderr, "Dialog library " + libname + " created."
-        libraries.storeLibraries()
+    libraries.createLibrary(libname)
+    print >> sys.stderr, "Dialog library " + libname + " created."
+    libraries.storeLibraries()
 
 
 class OpenOffice:
