@@ -20,7 +20,14 @@ if not is_found_uno:
         cand = os.path.dirname(cand)
         if os.path.exists(os.path.join(cand, "uno.py")):
             sys.path.append(cand)
+            is_found_uno = True
             break
+# For uno.py on MacOS
+if not is_found_uno:
+    cand = "/Applications/OpenOffice.app/Contents/MacOS"
+    if os.path.exists(os.path.join(cand, "uno.py")):
+        sys.path.append(cand)
+        is_found_uno = True
 import uno
 from com.sun.star.connection import NoConnectException
 
@@ -274,7 +281,7 @@ class OpenOffice:
             time.sleep(2)
             return
         os.setsid()
-        ooexec = os.path.join(os.path.dirname(uno.__file__), "soffice.bin")
+        ooexec = os.path.join(os.path.dirname(uno.__file__), "soffice")
         try:
             os.execl(
                 ooexec, ooexec,
