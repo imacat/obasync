@@ -1,6 +1,6 @@
 #! /opt/openoffice4/program/python
 # -*- coding: utf-8 -*-
-# OpenOffice Basic macros source synchronizer.
+# Office Basic macro source synchronizer.
 #   by imacat <imacat@mail.imacat.idv.tw>, 2016-08-31
 
 import argparse
