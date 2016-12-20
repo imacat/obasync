@@ -8,26 +8,28 @@ import os
 import sys
 import time
 
-# Finds uno.py for MS-Windows
-is_found_uno = False
-for p in sys.path:
-    if os.path.exists(os.path.join(p, "uno.py")):
-        is_found_uno = True
-        break
-if not is_found_uno:
+
+def append_uno_path():
+    """ Appends the path of the uno module to the import path.  """
+
+    is_found_uno = False
+    for p in sys.path:
+        if os.path.exists(os.path.join(p, "uno.py")):
+            return
+    # For uno.py on MacOS
+    cand = "/Applications/OpenOffice.app/Contents/MacOS"
+    if os.path.exists(os.path.join(cand, "uno.py")):
+        sys.path.append(cand)
+        return
+    # Finds uno.py for MS-Windows
     cand = sys.executable
     while cand != os.path.dirname(cand):
         cand = os.path.dirname(cand)
         if os.path.exists(os.path.join(cand, "uno.py")):
             sys.path.append(cand)
-            is_found_uno = True
-            break
-# For uno.py on MacOS
-if not is_found_uno:
-    cand = "/Applications/OpenOffice.app/Contents/MacOS"
-    if os.path.exists(os.path.join(cand, "uno.py")):
-        sys.path.append(cand)
-        is_found_uno = True
+            return
+
+append_uno_path()
 import uno
 from com.sun.star.connection import NoConnectException
 
