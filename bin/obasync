@@ -3,6 +3,7 @@
 # Office Basic macro source synchronizer.
 #   by imacat <imacat@mail.imacat.idv.tw>, 2016-08-31
 
+from __future__ import print_function
 import argparse
 import os
 import sys
@@ -12,7 +13,6 @@ import time
 def append_uno_path():
     """ Appends the path of the uno module to the import path.  """
 
-    is_found_uno = False
     for p in sys.path:
         if os.path.exists(os.path.join(p, "uno.py")):
             return
@@ -43,13 +43,14 @@ def main():
     parse_args()
 
     # Connects to the OpenOffice
-    oo = OpenOffice()
+    oo = OpenOffice(args.port)
 
     # Synchronize the Basic macros.
     sync_macros(oo)
 
-    print >> sys.stderr, "Done.  %02d:%02d elapsed." % \
-        (int((time.time() - t_start) / 60), (time.time() - t_start) % 60)
+    print("Done.  %02d:%02d elapsed." %
+          (int((time.time() - t_start) / 60),
+           (time.time() - t_start) % 60), file=sys.stderr)
 
 
 def parse_args():
@@ -58,7 +59,7 @@ def parse_args():
 
     parser = argparse.ArgumentParser(
         description=("Synchronize the local Basic scripts"
-                     " with OpenOffice Basic."))
+                     " with OpenOffice/LibreOffice Basic."))
     parser.add_argument(
         "projdir", metavar="dir", nargs="?", default=os.getcwd(),
         help=("The project source directory"
@@ -70,6 +71,10 @@ def parse_args():
     parser.add_argument(
         "--get", action="store_true",
         help="Downloads the macros instead of upload.")
+    parser.add_argument(
+        "-p", "--port", metavar="N", type=int, default=2002,
+        help=("The TCP port to communicate with "
+              "OpenOffice/LibreOffice with (default: %(default)s)"))
     parser.add_argument(
         "-r", "--run", metavar="Module.Macro",
         help="The macro to run after the upload, if any.")
@@ -96,8 +101,8 @@ def sync_macros(oo):
     if args.get:
         modules = read_basic_modules(libraries, args.library)
         if len(modules) == 0:
-            print >> sys.stderr, \
-                "ERROR: Library " + args.library + " does not exist"
+            print("ERROR: Library %s does not exist" % args.library,
+                  file=sys.stderr)
             return
         update_source_dir(args.projdir, modules)
 
@@ -105,8 +110,9 @@ def sync_macros(oo):
     else:
         modules = read_in_source_dir(args.projdir)
         if len(modules) == 0:
-            print >> sys.stderr, \
-                "ERROR: Found no source macros in " + args.projdir
+            print("ERROR: Found no source macros in %s" %
+                  args.projdir,
+                  file=sys.stderr)
             return
         update_basic_modules(libraries, args.library, modules, oo)
         if args.run is not None:
@@ -115,9 +121,9 @@ def sync_macros(oo):
                 "theMasterScriptProviderFactory")
             provider = factory.createScriptProvider("")
             script = provider.getScript(
-                "vnd.sun.star.script:"
-                + args.library + "." + args.run
-                + "?language=Basic&location=application")
+                "vnd.sun.star.script:%s.%s"
+                "?language=Basic&location=application" %
+                (args.library, args.run))
             script.invoke((), (), ())
     return
 
@@ -151,25 +157,27 @@ def update_source_dir(projdir, modules):
             f = open(path, "w")
             f.write(modules[modname])
             f.close()
-            print >> sys.stderr, modname + ".vb added."
+            print("%s.vb added." % modname, file=sys.stderr)
             is_in_sync = False
         else:
             path = os.path.join(projdir, curmods[modname])
             f = open(path, "r+")
             if modules[modname] != f.read().replace("\r\n", "\n"):
                 f.seek(0)
+                f.truncate(0)
                 f.write(modules[modname])
-                print >> sys.stderr, curmods[modname] + " updated."
+                print("%s updated." % curmods[modname],
+                      file=sys.stderr)
                 is_in_sync = False
             f.close()
     for modname in sorted(curmods.keys()):
         if modname not in modules:
             path = os.path.join(projdir, curmods[modname])
             os.remove(path)
-            print >> sys.stderr, curmods[modname] + " removed."
+            print("%s removed." % curmods[modname], file=sys.stderr)
             is_in_sync = False
     if is_in_sync:
-        print >> sys.stderr, "Everything is in sync."
+        print("Everything is in sync.", file=sys.stderr)
     return
 
 
@@ -189,12 +197,12 @@ def update_basic_modules(libraries, libname, modules, oo):
     """ Updates the OpenOffice Basic macros storage. """
     if not libraries.hasByName(libname):
         libraries.createLibrary(libname)
-        print >> sys.stderr, "Script library " + libname + " created."
+        print("Script library %s created." % libname, file=sys.stderr)
         create_dialog_library(oo, libname)
         library = libraries.getByName(libname)
         for modname in sorted(modules.keys()):
             library.insertByName(modname, modules[modname])
-            print >> sys.stderr, "Module " + modname + " added."
+            print("Module %s added." % modname, file=sys.stderr)
     else:
         libraries.loadLibrary(libname)
         library = libraries.getByName(libname)
@@ -202,18 +210,18 @@ def update_basic_modules(libraries, libname, modules, oo):
         for modname in sorted(modules.keys()):
             if modname not in curmods:
                 library.insertByName(modname, modules[modname])
-                print >> sys.stderr, "Module " + modname + " added."
+                print("Module %s added." % modname, file=sys.stderr)
             elif modules[modname] != library.getByName(modname):
                 library.replaceByName(modname, modules[modname])
-                print >> sys.stderr, "Module " + modname + " updated."
+                print("Module %s updated." % modname, file=sys.stderr)
         for modname in curmods:
             if modname not in modules:
                 library.removeByName(modname)
-                print >> sys.stderr, "Module " + modname + " removed."
+                print("Module %s removed." % modname, file=sys.stderr)
     if libraries.isModified():
         libraries.storeLibraries()
     else:
-        print >> sys.stderr, "Everything is in sync."
+        print("Everything is in sync.", file=sys.stderr)
     return
 
 
@@ -222,15 +230,16 @@ def create_dialog_library(oo, libname):
     libraries = oo.service_manager.createInstance(
         "com.sun.star.script.ApplicationDialogLibraryContainer")
     libraries.createLibrary(libname)
-    print >> sys.stderr, "Dialog library " + libname + " created."
+    print("Dialog library %s created." % libname, file=sys.stderr)
     libraries.storeLibraries()
 
 
 class OpenOffice:
     """ The OpenOffice connection. """
 
-    def __init__(self):
+    def __init__(self, port=2002):
         """Initializes the object."""
+        self.port = port
         self.bootstrap_context = None
         self.service_manager = None
         self.desktop = None
@@ -246,8 +255,8 @@ class OpenOffice:
         url_resolver = local_service_manager.createInstanceWithContext(
             "com.sun.star.bridge.UnoUrlResolver", local_context)
         # Obtains the context
-        url = ("uno:socket,host=localhost,port=2002;"
-               "urp;StarOffice.ComponentContext")
+        url = ("uno:socket,host=localhost,port=%d;"
+               "urp;StarOffice.ComponentContext") % self.port
         while True:
             try:
                 self.bootstrap_context = url_resolver.resolve(url)
@@ -266,31 +275,35 @@ class OpenOffice:
         # For MS-Windows, which does not have fork()
         if os.name == "nt":
             from subprocess import Popen
-            ooexec = os.path.join(os.path.dirname(uno.__file__), "soffice.exe")
+            ooexec = os.path.join(
+                os.path.dirname(uno.__file__), "soffice.exe")
             DETACHED_PROCESS = 0x00000008
-            Popen([ooexec, "-accept=socket,host=localhost,port=2002;urp;"],
+            Popen([ooexec,
+                   "-accept=socket,host=localhost,port=%d;urp;" %
+                   self.port],
                   close_fds=True, creationflags=DETACHED_PROCESS)
             time.sleep(2)
             return
 
-        # For POSIX systems, including Linux
+        # For POSIX systems, including Linux and MacOSX
         try:
             pid = os.fork()
         except OSError:
-            sys.stderr.write("failed to fork().\n")
+            print("Failed to fork().", file=sys.stderr)
             sys.exit(1)
         if pid != 0:
             time.sleep(2)
             return
         os.setsid()
-        ooexec = os.path.join(os.path.dirname(uno.__file__), "soffice")
+        ooexec = os.path.join(
+            os.path.dirname(uno.__file__), "soffice")
         try:
-            os.execl(
-                ooexec, ooexec,
-                "-accept=socket,host=localhost,port=2002;urp;")
+            os.execl(ooexec, ooexec,
+                     "-accept=socket,host=localhost,port=%d;urp;" %
+                     self.port)
         except OSError:
-            sys.stderr.write(
-                ooexec + ": Failed to run the OpenOffice server.\n")
+            print("%s: Failed to run the OpenOffice server." % ooexec,
+                  file=sys.stderr)
             sys.exit(1)
 
 if __name__ == "__main__":

@@ -1,3 +1,6 @@
 obasync TODO
 
-* Adds a README.
+* File extension.
+* Writes the README (reStructureText).
+* Documentation.
+* Python 3
