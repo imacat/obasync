@@ -135,10 +135,7 @@ def read_in_source_dir(projdir):
         path = os.path.join(projdir, entry)
         if os.path.isfile(path) and entry.lower().endswith(".vb"):
             modname = entry[0:-3]
-            f = open(path)
-            modules[modname] = f.read().decode("utf-8").replace(
-                "\r\n", "\n")
-            f.close()
+            modules[modname] = read_file(path)
     return modules
 
 
@@ -154,22 +151,15 @@ def update_source_dir(projdir, modules):
     for modname in sorted(modules.keys()):
         if modname not in curmods:
             path = os.path.join(projdir, modname + ".vb")
-            f = open(path, "w")
-            f.write(modules[modname])
-            f.close()
+            write_file(path, modules[modname])
             print("%s.vb added." % modname, file=sys.stderr)
             is_in_sync = False
         else:
             path = os.path.join(projdir, curmods[modname])
-            f = open(path, "r+")
-            if modules[modname] != f.read().replace("\r\n", "\n"):
-                f.seek(0)
-                f.truncate(0)
-                f.write(modules[modname])
+            if update_file(path, modules[modname]):
                 print("%s updated." % curmods[modname],
                       file=sys.stderr)
                 is_in_sync = False
-            f.close()
     for modname in sorted(curmods.keys()):
         if modname not in modules:
             path = os.path.join(projdir, curmods[modname])
@@ -189,7 +179,7 @@ def read_basic_modules(libraries, libname):
     libraries.loadLibrary(libname)
     library = libraries.getByName(libname)
     for modname in library.getElementNames():
-        modules[modname] = library.getByName(modname).encode("utf-8")
+        modules[modname] = library.getByName(modname)
     return modules
 
 
@@ -232,6 +222,56 @@ def create_dialog_library(oo, libname):
     libraries.createLibrary(libname)
     print("Dialog library %s created." % libname, file=sys.stderr)
     libraries.storeLibraries()
+
+
+def read_file(path):
+    """ Reads a file, and deals with Python 3 / 2 compatibility.  """
+    if sys.version_info.major == 2:
+        f = open(path)
+        content = f.read().decode("utf-8").replace("\r\n", "\n")
+        f.close()
+    else:
+        f = open(path, encoding="utf-8")
+        content = f.read().replace("\r\n", "\n")
+        f.close()
+    return content
+
+
+def write_file(path, content):
+    """ Writes to a file, and deals with Python 3 / 2
+        compatibility.  """
+    if sys.version_info.major == 2:
+        f = open(path, "w")
+        f.write(content.encode("utf-8"))
+        f.close()
+    else:
+        f = open(path, "w", encoding="utf-8")
+        f.write(content)
+        f.close()
+    return
+
+
+def update_file(path, content):
+    """ Updates a file, and deals with Python 3 / 2
+        compatibility.  """
+    is_updated = False
+    if sys.version_info.major == 2:
+        f = open(path, "r+")
+        if content != f.read().decode("utf-8").replace("\r\n", "\n"):
+            f.seek(0)
+            f.truncate(0)
+            f.write(content.encode("utf-8"))
+            is_updated = True
+        f.close()
+    else:
+        f = open(path, "r+", encoding="utf-8")
+        if content != f.read().replace("\r\n", "\n"):
+            f.seek(0)
+            f.truncate(0)
+            f.write(content)
+            is_updated = True
+        f.close()
+    return is_updated
 
 
 class OpenOffice:
