@@ -358,10 +358,14 @@ class Office:
                   "OpenOffice/LibreOffice installation.",
                   file=sys.stderr)
             sys.exit(1)
+        param = "-accept=socket,host=localhost,port=%d;urp;" % \
+            self.port
+        # LibreOffice on POSIX systems uses --accept instead of
+        # -accept now.
+        if ooexec.lower().find("libreoffice") != -1:
+            param = "-" + param
         try:
-            os.execl(ooexec, ooexec,
-                     "-accept=socket,host=localhost,port=%d;urp;" %
-                     self.port)
+            os.execl(ooexec, ooexec, param)
         except OSError:
             print("%s: Failed to run the"
                   " OpenOffice/LibreOffice server." % ooexec,
