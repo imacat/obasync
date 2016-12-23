@@ -148,7 +148,7 @@ def read_in_source_dir(projdir, ext, encoding):
         path = os.path.join(projdir, entry)
         if os.path.isfile(path) \
                 and entry.lower().endswith(ext.lower()):
-            modname = entry[0:-3]
+            modname = entry[0:-len(ext)]
             modules[modname] = read_file(path, encoding)
     return modules
 
