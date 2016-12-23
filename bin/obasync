@@ -8,6 +8,7 @@ import argparse
 import os
 import sys
 import time
+import locale
 
 
 def append_uno_path():
@@ -46,7 +47,7 @@ def main():
     oo = Office(args.port)
 
     # Synchronize the Basic macros.
-    sync_macros(oo, args.ext)
+    sync_macros(oo, args.ext, args.encoding)
 
     print("Done.  %02d:%02d elapsed." %
           (int((time.time() - t_start) / 60),
@@ -76,8 +77,13 @@ def parse_args():
         help=("The TCP port to communicate with "
               "OpenOffice/LibreOffice with (default: %(default)s)"))
     parser.add_argument(
-        "-e", "--ext", metavar=".EXT", default=".vb",
+        "-x", "--ext", metavar=".EXT", default=".vb",
         help=("The file name extension of the source files.  "
+              "(default: %(default)s)"))
+    parser.add_argument(
+        "-e", "--encoding", metavar="CS",
+        default=locale.getpreferredencoding(),
+        help=("The encoding of the source files.  "
               "(default: %(default)s)"))
     parser.add_argument(
         "-r", "--run", metavar="Module.Macro",
@@ -98,7 +104,7 @@ def parse_args():
     return
 
 
-def sync_macros(oo, ext):
+def sync_macros(oo, ext, encoding):
     """ Synchronize the Basic macros. """
     global args
 
@@ -111,11 +117,11 @@ def sync_macros(oo, ext):
             print("ERROR: Library %s does not exist" % args.library,
                   file=sys.stderr)
             return
-        update_source_dir(args.projdir, modules, ext)
+        update_source_dir(args.projdir, modules, ext, encoding)
 
     # Uploads the macros onto OpenOffice/LibreOffice Basic
     else:
-        modules = read_in_source_dir(args.projdir, ext)
+        modules = read_in_source_dir(args.projdir, ext, encoding)
         if len(modules) == 0:
             print("ERROR: Found no source macros in %s" %
                   args.projdir,
@@ -135,7 +141,7 @@ def sync_macros(oo, ext):
     return
 
 
-def read_in_source_dir(projdir, ext):
+def read_in_source_dir(projdir, ext, encoding):
     """ Reads-in the source macros. """
     modules = {}
     for entry in os.listdir(projdir):
@@ -143,11 +149,11 @@ def read_in_source_dir(projdir, ext):
         if os.path.isfile(path) \
                 and entry.lower().endswith(ext.lower()):
             modname = entry[0:-3]
-            modules[modname] = read_file(path)
+            modules[modname] = read_file(path, encoding)
     return modules
 
 
-def update_source_dir(projdir, modules, ext):
+def update_source_dir(projdir, modules, ext, encoding):
     """ Updates the source macros. """
     curmods = {}
     is_in_sync = True
@@ -160,12 +166,12 @@ def update_source_dir(projdir, modules, ext):
     for modname in sorted(modules.keys()):
         if modname not in curmods:
             path = os.path.join(projdir, modname + ext)
-            write_file(path, modules[modname])
+            write_file(path, modules[modname], encoding)
             print("%s added." % (modname + ext), file=sys.stderr)
             is_in_sync = False
         else:
             path = os.path.join(projdir, curmods[modname])
-            if update_file(path, modules[modname]):
+            if update_file(path, modules[modname], encoding):
                 print("%s updated." % curmods[modname],
                       file=sys.stderr)
                 is_in_sync = False
@@ -234,47 +240,47 @@ def create_dialog_library(oo, libname):
     libraries.storeLibraries()
 
 
-def read_file(path):
+def read_file(path, encoding):
     """ Reads a file, and deals with Python 3 / 2 compatibility.  """
     if sys.version_info.major == 2:
         f = open(path)
-        content = f.read().decode("utf-8").replace("\r\n", "\n")
+        content = f.read().decode(encoding).replace("\r\n", "\n")
         f.close()
     else:
-        f = open(path, encoding="utf-8")
+        f = open(path, encoding=encoding)
         content = f.read().replace("\r\n", "\n")
         f.close()
     return content
 
 
-def write_file(path, content):
+def write_file(path, content, encoding):
     """ Writes to a file, and deals with Python 3 / 2
         compatibility.  """
     if sys.version_info.major == 2:
         f = open(path, "w")
-        f.write(content.encode("utf-8"))
+        f.write(content.encode(encoding))
         f.close()
     else:
-        f = open(path, "w", encoding="utf-8")
+        f = open(path, "w", encoding=encoding)
         f.write(content)
         f.close()
     return
 
 
-def update_file(path, content):
+def update_file(path, content, encoding):
     """ Updates a file, and deals with Python 3 / 2
         compatibility.  """
     is_updated = False
     if sys.version_info.major == 2:
         f = open(path, "r+")
-        if content != f.read().decode("utf-8").replace("\r\n", "\n"):
+        if content != f.read().decode(encoding).replace("\r\n", "\n"):
             f.seek(0)
             f.truncate(0)
-            f.write(content.encode("utf-8"))
+            f.write(content.encode(encoding))
             is_updated = True
         f.close()
     else:
-        f = open(path, "r+", encoding="utf-8")
+        f = open(path, "r+", encoding=encoding)
         if content != f.read().replace("\r\n", "\n"):
             f.seek(0)
             f.truncate(0)
