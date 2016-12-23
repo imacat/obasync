@@ -352,8 +352,12 @@ class Office:
             time.sleep(2)
             return
         os.setsid()
-        ooexec = os.path.join(
-            os.path.dirname(uno.__file__), "soffice")
+        ooexec = self.find_posix_ooexec()
+        if ooexec is None:
+            print("Failed to find the "
+                  "OpenOffice/LibreOffice installation.",
+                  file=sys.stderr)
+            sys.exit(1)
         try:
             os.execl(ooexec, ooexec,
                      "-accept=socket,host=localhost,port=%d;urp;" %
@@ -363,6 +367,33 @@ class Office:
                   " OpenOffice/LibreOffice server." % ooexec,
                   file=sys.stderr)
             sys.exit(1)
+
+    def find_posix_ooexec(self):
+        """ Finds the OpenOffice/LibreOffice executable on POSIX
+            systems (Linux or MacOSX).  """
+        # Checkes soffice in the same directory of uno.py
+        # This works for Linux OpenOffice/LibreOffice local
+        # installation, and OpenOffice on MacOSX.
+        ooexec = os.path.join(
+            os.path.dirname(uno.__file__), "soffice")
+        if os.path.exists(ooexec):
+            return ooexec
+        
+        # Now we have LibreOffice on MacOSX and Linux
+        # OpenOffice/LibreOffice vender installation.
+        
+        # LibreOffice on MacOSX.
+        ooexec = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+        if os.path.exists(ooexec):
+            return ooexec
+        
+        # Linux OpenOffice/LibreOffice vender installation.
+        ooexec = "/usr/bin/soffice"
+        if os.path.exists(ooexec):
+            return ooexec
+        
+        # Not found
+        return None
 
 if __name__ == "__main__":
     main()
