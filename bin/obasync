@@ -362,7 +362,7 @@ class Office:
             self.port
         # LibreOffice on POSIX systems uses --accept instead of
         # -accept now.
-        if ooexec.lower().find("libreoffice") != -1:
+        if self.is_ooexec_lo(ooexec):
             param = "-" + param
         try:
             os.execl(ooexec, ooexec, param)
@@ -398,6 +398,22 @@ class Office:
         
         # Not found
         return None
+
+    def is_ooexec_lo(self, ooexec):
+        """ Checks whether the soffice executable is LibreOffice.
+            LibreOffice on POSIX systems uses --accept instead of
+            -accept now.  """
+        # This works for most cases.
+        if ooexec.lower().find("libreoffice") != -1:
+            return True
+        
+        # Checks the symbolic link at /usr/bin/soffice
+        if ooexec == "/usr/bin/soffice" and os.path.islink(ooexec):
+            if os.readlink(ooexec).lower().find("libreoffice") != -1:
+                return True
+        
+        # Not found
+        return False
 
 if __name__ == "__main__":
     main()
