@@ -1,6 +1,10 @@
 obasync TODO
 
 * File extension.
+* Encoding
+* LibreOffice switch (--xxx or -xxx)
+* LibreOffice on MacOSX (how to install?)
+* Linux system-bundled LibreOffice.
 * Writes the README (reStructureText).
 * Documentation.
 * Python 3

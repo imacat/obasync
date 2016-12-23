@@ -42,11 +42,11 @@ def main():
     # Parses the arguments
     parse_args()
 
-    # Connects to the OpenOffice
-    oo = OpenOffice(args.port)
+    # Connects to the OpenOffice/LibreOffice
+    oo = Office(args.port)
 
     # Synchronize the Basic macros.
-    sync_macros(oo)
+    sync_macros(oo, args.ext)
 
     print("Done.  %02d:%02d elapsed." %
           (int((time.time() - t_start) / 60),
@@ -76,6 +76,10 @@ def parse_args():
         help=("The TCP port to communicate with "
               "OpenOffice/LibreOffice with (default: %(default)s)"))
     parser.add_argument(
+        "-e", "--ext", metavar=".EXT", default=".vb",
+        help=("The file name extension of the source files.  "
+              "(default: %(default)s)"))
+    parser.add_argument(
         "-r", "--run", metavar="Module.Macro",
         help="The macro to run after the upload, if any.")
     parser.add_argument(
@@ -87,28 +91,31 @@ def parse_args():
     # Obtains the library name from the path
     if args.library is None:
         args.library = os.path.basename(args.projdir)
+    # Adjusts the file name extension.
+    if args.ext[0] != ".":
+        args.ext = "." + args.ext
 
     return
 
 
-def sync_macros(oo):
+def sync_macros(oo, ext):
     """ Synchronize the Basic macros. """
     global args
 
     libraries = oo.service_manager.createInstance(
         "com.sun.star.script.ApplicationScriptLibraryContainer")
-    # Downloads the macros from OpenOffice
+    # Downloads the macros from OpenOffice/LibreOffice Basic
     if args.get:
         modules = read_basic_modules(libraries, args.library)
         if len(modules) == 0:
             print("ERROR: Library %s does not exist" % args.library,
                   file=sys.stderr)
             return
-        update_source_dir(args.projdir, modules)
+        update_source_dir(args.projdir, modules, ext)
 
-    # Uploads the macros onto OpenOffice
+    # Uploads the macros onto OpenOffice/LibreOffice Basic
     else:
-        modules = read_in_source_dir(args.projdir)
+        modules = read_in_source_dir(args.projdir, ext)
         if len(modules) == 0:
             print("ERROR: Found no source macros in %s" %
                   args.projdir,
@@ -128,31 +135,33 @@ def sync_macros(oo):
     return
 
 
-def read_in_source_dir(projdir):
+def read_in_source_dir(projdir, ext):
     """ Reads-in the source macros. """
     modules = {}
     for entry in os.listdir(projdir):
         path = os.path.join(projdir, entry)
-        if os.path.isfile(path) and entry.lower().endswith(".vb"):
+        if os.path.isfile(path) \
+                and entry.lower().endswith(ext.lower()):
             modname = entry[0:-3]
             modules[modname] = read_file(path)
     return modules
 
 
-def update_source_dir(projdir, modules):
+def update_source_dir(projdir, modules, ext):
     """ Updates the source macros. """
     curmods = {}
     is_in_sync = True
     for entry in os.listdir(projdir):
         path = os.path.join(projdir, entry)
-        if os.path.isfile(path) and entry.lower().endswith(".vb"):
-            modname = entry[0:-3]
+        if os.path.isfile(path) \
+                and entry.lower().endswith(ext.lower()):
+            modname = entry[0:-len(ext)]
             curmods[modname] = entry
     for modname in sorted(modules.keys()):
         if modname not in curmods:
-            path = os.path.join(projdir, modname + ".vb")
+            path = os.path.join(projdir, modname + ext)
             write_file(path, modules[modname])
-            print("%s.vb added." % modname, file=sys.stderr)
+            print("%s added." % (modname + ext), file=sys.stderr)
             is_in_sync = False
         else:
             path = os.path.join(projdir, curmods[modname])
@@ -172,7 +181,8 @@ def update_source_dir(projdir, modules):
 
 
 def read_basic_modules(libraries, libname):
-    """ Reads the OpenOffice Basic macros from the macros storage. """
+    """ Reads the OpenOffice/LibreOffice Basic macros from the macros
+        storage. """
     modules = {}
     if not libraries.hasByName(libname):
         return modules
@@ -184,7 +194,7 @@ def read_basic_modules(libraries, libname):
 
 
 def update_basic_modules(libraries, libname, modules, oo):
-    """ Updates the OpenOffice Basic macros storage. """
+    """ Updates the OpenOffice/LibreOffice Basic macro storage. """
     if not libraries.hasByName(libname):
         libraries.createLibrary(libname)
         print("Script library %s created." % libname, file=sys.stderr)
@@ -274,11 +284,11 @@ def update_file(path, content):
     return is_updated
 
 
-class OpenOffice:
-    """ The OpenOffice connection. """
+class Office:
+    """ The OpenOffice/LibreOffice connection. """
 
     def __init__(self, port=2002):
-        """Initializes the object."""
+        """ Initializes the object."""
         self.port = port
         self.bootstrap_context = None
         self.service_manager = None
@@ -286,7 +296,7 @@ class OpenOffice:
         self.connect()
 
     def connect(self):
-        """Connects to the running OpenOffice process."""
+        """ Connects to the running OpenOffice/LibreOffice process."""
         # Obtains the local context
         local_context = uno.getComponentContext()
         # Obtains the local service manager
@@ -311,7 +321,8 @@ class OpenOffice:
             "com.sun.star.frame.Desktop", self.bootstrap_context)
 
     def start_oo(self):
-        """Starts the OpenOffice in server listening mode"""
+        """ Starts the OpenOffice/LibreOffice in server listening
+            mode.  """
         # For MS-Windows, which does not have fork()
         if os.name == "nt":
             from subprocess import Popen
@@ -342,7 +353,8 @@ class OpenOffice:
                      "-accept=socket,host=localhost,port=%d;urp;" %
                      self.port)
         except OSError:
-            print("%s: Failed to run the OpenOffice server." % ooexec,
+            print("%s: Failed to run the"
+                  " OpenOffice/LibreOffice server." % ooexec,
                   file=sys.stderr)
             sys.exit(1)
 
