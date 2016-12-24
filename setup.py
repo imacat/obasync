@@ -12,7 +12,7 @@ if os.path.basename(sys.executable) == "python.bin":
         os.path.dirname(sys.executable), "python")
 
 setup(name="obasync",
-      version="0.1",
+      version="0.2",
       description="Office Basic macro source synchronizer",
       url="https://github.com/imacat/obasync",
       author="imacat",
