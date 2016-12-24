@@ -70,7 +70,7 @@ def parse_args():
         help=("The Library to upload/download the macros"
               " (default to the name of the directory)."))
     parser.add_argument(
-        "--get", action="store_true",
+        "-g", "--get", action="store_true",
         help="Downloads the macros instead of upload.")
     parser.add_argument(
         "-p", "--port", metavar="N", type=int, default=2002,
