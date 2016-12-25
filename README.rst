@@ -14,7 +14,8 @@ Given the following source files:
 * Directory: ``MyApp``
 * Files: ``MyMacros.vb`` ``Utils.vb`` ``Registry.vb`` ``Data.vb``
 
-Running ``obasync`` will synchronze them with the followin macros:
+Running ``obasync`` will synchronize them with the following Basic
+macros:
 
 * Library: ``MyApp``
 * Modules: ``MyMacros`` ``Utils`` ``Registry`` ``Data``
@@ -22,12 +23,12 @@ Running ``obasync`` will synchronze them with the followin macros:
 If the Basic library ``MyApp`` does not exist, it will be created.
 Missing modules will be added, and excess modules will be removed.
 
-And vice versa.  Given the following macros:
+And vice versa.  Given the following Basic macros:
 
 * Library: ``MyApp``
 * Modules: ``MyMacros`` ``Utils`` ``Registry`` ``Data``
 
-Running ``obasync --get`` will synchronze them with the following
+Running ``obasync --get`` will synchronize them with the following
 source files:
 
 * Directory: ``MyApp``
@@ -52,22 +53,23 @@ when possible.
 
     /opt/libreoffice5.*/program/python `which pip` install obasync
 
-* Linux vender OpenOffice/LibreOffice installation::
+* Linux vendor OpenOffice/LibreOffice installation::
 
     pip install obasync
 
-* OpenOffice on MacOSX relies on the system ``python`` installation::
+* OpenOffice on Mac OS X relies on the system ``python``
+  installation::
 
     sudo pip install obasync
 
-* LibreOffice on MacOSX:  There is no simple ``pip`` way to install
+* LibreOffice on Mac OS X:  There is no simple ``pip`` way to install
   ``obasync``.  However, you can still download the script and run
   it with the ``python`` executable that comes with your LibreOffice
   installation.  See below.
 
 * OpenOffice/LibreOffice on MS-Windows:  You can still install
   ``obasync`` with ``pip`` from your OpenOffice/LibreOffice
-  installation.  However, it would be much asir to just download the
+  installation.  However, it would be much easier to just download the
   script and run it with the ``python`` executable that comes with
   your OpenOffice/LibreOffice installation.  See below.
 
@@ -92,31 +94,31 @@ library
    The name of the Basic library.  Default to the same name as the
    project source directory.
 
--g,--get
+-g, --get
    Download (check out) the macros from the OpenOffice/LibreOffice
    Basic storage to the source files, instead of upload (check in).
    By default it uploads the source files onto the
    OpenOffice/LibreOffice Basic storage.
 
--p,--port N
+-p, --port N
    The TCP port to communicate with OpenOffice/LibreOffice.  The
    default is 2002.  You can change it if port 2002 is already in use.
 
--x,--ext .EXT
+-x, --ext .EXT
    The file name extension of the source files.  The default is
    ``.vb``.  This may be used for your convenience of editor syntax
    highlighting.
 
--e,--encoding CS
+-e, --encoding CS
    The encoding of the source files.  The default is system-dependent.
    For example, on Traditional Chinese MS-Windows, this will be
    CP950 (Big5).  You can change this to UTF-8 for convenience if you
-   obtain/sychronize your source code from other sources.
+   obtain/synchronize your source code from other sources.
 
--r,--run Module.Macro
-   Run he specific macro after sychronization, for convenience.
+-r, --run Module.Macro
+   Run he specific macro after synchronization, for convenience.
 
--h,--help
+-h, --help
    Show the help message and exit
 
 -v,--version
@@ -144,6 +146,3 @@ SUPPORT
 -------
 
   Contact imacat <imacat@mail.imacat.idv.tw> if you have any question.
-
-
-
