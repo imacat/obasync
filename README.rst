@@ -84,45 +84,43 @@ OPTIONS
 
 ::
 
-  obasync [options] [directory [library]]
+  obasync [options] [DIRECTORY [LIBRARY]]
 
-directory
-   The project source directory.  Default to the current working
-   directory.
+DIRECTORY       The project source directory.  Default to the current
+                working directory.
 
-library
-   The name of the Basic library.  Default to the same name as the
-   project source directory.
+LIBRARY         The name of the Basic library.  Default to the same
+                name as the project source directory.
 
--g, --get
-   Download (check out) the macros from the OpenOffice/LibreOffice
-   Basic storage to the source files, instead of upload (check in).
-   By default it uploads the source files onto the
-   OpenOffice/LibreOffice Basic storage.
+--get           Download (check out) the macros from the
+                OpenOffice/LibreOffice Basic storage to the source
+                files, instead of upload (check in).  By default it
+                uploads the source files onto the
+                OpenOffice/LibreOffice Basic storage.
 
--p, --port N
-   The TCP port to communicate with OpenOffice/LibreOffice.  The
-   default is 2002.  You can change it if port 2002 is already in use.
+-p, --port N    The TCP port to communicate with
+                OpenOffice/LibreOffice.  The default is 2002.  You can
+                change it if port 2002 is already in use.
 
--x, --ext .EXT
-   The file name extension of the source files.  The default is
-   ``.vb``.  This may be used for your convenience of editor syntax
-   highlighting.
+-x, --ext .EXT  The file name extension of the source files.  The 
+                default is ``.vb``.  This may be used for your
+                convenience of editor syntax highlighting.
 
 -e, --encoding CS
-   The encoding of the source files.  The default is system-dependent.
-   For example, on Traditional Chinese MS-Windows, this will be
-   CP950 (Big5).  You can change this to UTF-8 for convenience if you
-   obtain/synchronize your source code from other sources.
+                The encoding of the source files.  The default is
+                system-dependent.  For example, on Traditional Chinese
+                MS-Windows, this will be CP950 (Big5).  You can change
+                this to UTF-8 for convenience if you
+                obtain/synchronize your source code from other
+                sources.
 
--r, --run Module.Macro
-   Run he specific macro after synchronization, for convenience.
+-r, --run MODULE.MACRO
+                Run he specific macro after synchronization, for
+                convenience.
 
--h, --help
-   Show the help message and exit
+-h, --help      Show the help message and exit
 
--v,--version
-   Show program's version number and exit
+-v, --version   Show program's version number and exit
 
 
 COPYRIGHT

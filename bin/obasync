@@ -62,15 +62,15 @@ def parse_args():
         description=("Synchronize the local Basic scripts"
                      " with OpenOffice/LibreOffice Basic."))
     parser.add_argument(
-        "projdir", metavar="dir", nargs="?", default=os.getcwd(),
+        "projdir", metavar="DIR", nargs="?", default=os.getcwd(),
         help=("The project source directory"
               " (default to the current directory)."))
     parser.add_argument(
-        "library", metavar="Library", nargs="?",
+        "library", metavar="LIBRARY", nargs="?",
         help=("The Library to upload/download the macros"
               " (default to the name of the directory)."))
     parser.add_argument(
-        "-g", "--get", action="store_true",
+        "--get", action="store_true",
         help="Downloads the macros instead of upload.")
     parser.add_argument(
         "-p", "--port", metavar="N", type=int, default=2002,
@@ -86,7 +86,7 @@ def parse_args():
         help=("The encoding of the source files.  "
               "(default: %(default)s)"))
     parser.add_argument(
-        "-r", "--run", metavar="Module.Macro",
+        "-r", "--run", metavar="MODULE.MACRO",
         help="The macro to run after the upload, if any.")
     parser.add_argument(
         "-v", "--version", action="version", version="%(prog)s 0.2")
