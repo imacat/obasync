@@ -23,7 +23,7 @@ macros:
 If the Basic library ``MyApp`` does not exist, it will be created.
 Missing modules will be added, and excess modules will be removed.
 
-And vice versa.  Given the following Basic macros:
+On the other hand, given the following Basic macros:
 
 * Library: ``MyApp``
 * Modules: ``MyMacros`` ``Utils`` ``Registry`` ``Data``
@@ -41,42 +41,180 @@ deleted.
 INSTALL
 -------
 
-You can install ``obasync`` with ``pip``.  Uses the ``python``
-executable that comes with your OpenOffice/LibreOffice installation
-when possible.
+You can either:
 
-* OpenOffice 4 on Linux::
+1. Install ``obasync`` with ``pip`` (recommended), or
 
-    /opt/openoffice4/program/python `which pip` install obasync
+2. Download the ``obasync`` script manually, and run it with the
+   Python that come with your OpenOffice/LibreOffice installation.
 
-* LibreOffice 5.x on Linux::
+We will explain them in detail.
 
-    /opt/libreoffice5.*/program/python `which pip` install obasync
 
-* Linux vendor OpenOffice/LibreOffice installation::
+OpenOffice/LibreOffice That Comes with Your Linux
+#################################################
+
+Install with ``pip`` (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Your system may already have ``pip`` installed.  If not, install the
+``python-pip`` package from the system package manager.  Then, run::
 
     pip install obasync
 
-* OpenOffice on Mac OS X relies on the system ``python``
-  installation::
+Download and Install Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Download ``obasync`` from either `PyPI
+<https://pypi.python.org/pypi/obasync>`_ or `GitHub
+<https://github.com/imacat/obasync>`_.  Then, run ``obasync`` as::
+
+    python obasync
+
+Or, you can edit the script and change the first line (shebang) to::
+
+    #! /usr/bin/python
+
+and save this script somewhere in your path, say, ``/usr/local/bin``.
+Then you can run ``obasync``.
+
+
+OpenOffice 4 on Linux
+#####################
+
+Install with ``pip`` (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Install ``pip`` for your OpenOffice installation, and then install
+``obasync`` with this ``pip``::
+
+    wget https://bootstrap.pypa.io/get-pip.py
+    sudo /opt/openoffice4/program/python get-pip.py
+    /opt/openoffice4/program/python-core-2.7.6/bin/pip install obasync
+
+Download and Install Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Download ``obasync`` from either `PyPI
+<https://pypi.python.org/pypi/obasync>`_ or `GitHub
+<https://github.com/imacat/obasync>`_.  Then, run ``obasync`` as::
+
+    /opt/openoffice4/program/python obasync
+
+Or, you can edit the script and change the first line (shebang) to::
+
+    #! /opt/openoffice4/program/python
+
+and save this script somewhere in your path, say, ``/usr/local/bin``.
+Then you can run ``obasync``.
+
+
+LibreOffice on Linux
+####################
+
+Python from LibreOffice on Linux does not install ``pip`` properly.
+However, you can still download and install ``obasync`` manually.
+
+Install with ``pip`` (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Download ``obasync`` from either `PyPI
+<https://pypi.python.org/pypi/obasync>`_ or `GitHub
+<https://github.com/imacat/obasync>`_.  Then, run ``obasync`` as::
+
+    /opt/libreoffice5.2/program/python obasync
+
+Or, you can edit the script and change the first line (shebang) to::
+
+    #! /opt/libreoffice5.2/program/python
+
+and save this script somewhere in your path, say, ``/usr/local/bin``.
+Then you can run ``obasync``.
+
+
+OpenOffice on MS-Windows
+########################
+
+You can install ``obasync`` with ``pip``, but the result is messy.
+The recommended way is to download and install ``obasync`` manually.
+
+Download and Install Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Download ``obasync`` from either `PyPI
+<https://pypi.python.org/pypi/obasync>`_ or `GitHub
+<https://github.com/imacat/obasync>`_.  Then, run ``obasync`` as::
+
+    "C:\Program Files (x86)\OpenOffice 4\program\python.exe" obasync
+
+
+LibreOffice on MS-Windows
+#########################
+
+You can install ``obasync`` with ``pip``, but the result is messy.
+The recommended way is to download and install ``obasync`` manually.
+
+Download and Install Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Download ``obasync`` from either `PyPI
+<https://pypi.python.org/pypi/obasync>`_ or `GitHub
+<https://github.com/imacat/obasync>`_.  Then, run ``obasync`` as::
+
+    "C:\Program Files\LibreOffice 5\program\python.exe" obasync
+
+
+OpenOffice on Mac OS X
+######################
+
+Install with ``pip`` (Recommended)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Install ``pip`` first, and then install ``obasync`` with ``pip``::
+
+    wget https://bootstrap.pypa.io/get-pip.py
+    sudo python get-pip.py
     sudo pip install obasync
 
-* LibreOffice on Mac OS X:  There is no simple ``pip`` way to install
-  ``obasync``.  However, you can still download the script and run
-  it with the ``python`` executable that comes with your LibreOffice
-  installation.  See below.
+Download and Install Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* OpenOffice/LibreOffice on MS-Windows:  You can still install
-  ``obasync`` with ``pip`` from your OpenOffice/LibreOffice
-  installation.  However, it would be much easier to just download the
-  script and run it with the ``python`` executable that comes with
-  your OpenOffice/LibreOffice installation.  See below.
+Download ``obasync`` from either `PyPI
+<https://pypi.python.org/pypi/obasync>`_ or `GitHub
+<https://github.com/imacat/obasync>`_.  Then, run ``obasync`` as::
 
-To download the package or the source script:
+    python obasync
 
-* Python package: https://pypi.python.org/pypi/obasync
-* Source directory: https://github.com/imacat/obasync
+Or, you can edit the script and change the first line (shebang) to::
+
+    #! /usr/bin/python
+
+and save this script somewhere in your path, say, ``/usr/local/bin``.
+Then you can run ``obasync``.
+
+
+
+LibreOffice on Mac OS X
+#######################
+
+Python from LibreOffice on Mac OS X does not install ``pip`` properly.
+However, you can still download and install ``obasync`` manually.
+
+Download and Install Manually
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Download ``obasync`` from either `PyPI
+<https://pypi.python.org/pypi/obasync>`_ or `GitHub
+<https://github.com/imacat/obasync>`_.  Then, run ``obasync`` as::
+
+    /Applications/LibreOffice.app/Contents/Resources/python obasync
+
+Or, you can edit the script and change the first line (shebang) to::
+
+    #! /Applications/LibreOffice.app/Contents/Resources/python
+
+and save this script somewhere in your path, say, ``/usr/local/bin``.
+Then you can run ``obasync``.
 
 
 OPTIONS
@@ -120,7 +258,7 @@ LIBRARY         The name of the Basic library.  Default to the same
 
 -h, --help      Show the help message and exit
 
--v, --version   Show program's version number and exit
+-v, --version   Show program’s version number and exit
 
 
 COPYRIGHT
