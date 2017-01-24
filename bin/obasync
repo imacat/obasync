@@ -207,7 +207,7 @@ def parse_args():
         "-r", "--run", metavar="MODULE.MACRO",
         help="The macro to run after the upload, if any.")
     parser.add_argument(
-        "-v", "--version", action="version", version="%(prog)s 0.3")
+        "-v", "--version", action="version", version="%(prog)s 0.4")
     args = parser.parse_args()
 
     # Obtains the absolute path

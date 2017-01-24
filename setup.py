@@ -29,11 +29,30 @@ if os.path.basename(sys.executable) == "python.bin":
         os.path.dirname(sys.executable), "python")
 
 setup(name="obasync",
-      version="0.3",
+      version="0.4",
       description="Office Basic macro source synchronizer",
-      url="https://github.com/imacat/obasync",
+      url="https://pypi.python.org/pypi/obasync",
       author="imacat",
       author_email="imacat@mail.imacat.idv.tw",
       license="Apache License, Version 2.0",
       zip_safe=False,
-      scripts=["bin/obasync"])
+      scripts=["bin/obasync"],
+      platforms=["Linux", "MS-Windows", "MacOS X"],
+      keywords=["OpenOffice", "LibreOffice", "uno", "Basic", "macro"],
+      classifiers=[
+          "Development Status :: 5 - Production/Stable",
+          "Environment :: Console",
+          "Intended Audience :: Developers",
+          "License :: OSI Approved :: Apache Software License",
+          "Operating System :: MacOS :: MacOS X",
+          "Operating System :: Microsoft :: Windows",
+          "Operating System :: POSIX :: Linux",
+          "Programming Language :: Python :: 2",
+          "Programming Language :: Python :: 2.7",
+          "Programming Language :: Python :: 3",
+          "Programming Language :: Python :: 3.5",
+          "Topic :: Office/Business :: Office Suites",
+          ("Topic :: Text Editors :: "
+           "Integrated Development Environments (IDE)"),
+          "Topic :: Utilities"
+      ])
