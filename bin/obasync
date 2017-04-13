@@ -499,7 +499,7 @@ class Office:
             try:
                 self.bootstrap_context = url_resolver.resolve(url)
             except NoConnectException:
-                self.start_oo()
+                self.__start_oo()
             else:
                 break
         # Obtains the service manager
@@ -508,7 +508,7 @@ class Office:
         self.desktop = self.service_manager.createInstanceWithContext(
             "com.sun.star.frame.Desktop", self.bootstrap_context)
 
-    def start_oo(self):
+    def __start_oo(self):
         """Start OpenOffice/LibreOffice in server listening mode."""
         # For MS-Windows, which does not have fork()
         if os.name == "nt":
@@ -533,7 +533,7 @@ class Office:
             time.sleep(2)
             return
         os.setsid()
-        soffice = self.find_posix_soffice()
+        soffice = self.__find_posix_soffice()
         if soffice is None:
             print("Failed to find the "
                   "OpenOffice/LibreOffice installation.",
@@ -543,7 +543,7 @@ class Office:
             self.port
         # LibreOffice on POSIX systems uses --accept instead of
         # -accept now.
-        if self.is_soffice_lo(soffice):
+        if self.__is_soffice_lo(soffice):
             param = "-" + param
         try:
             os.execl(soffice, soffice, param)
@@ -553,7 +553,7 @@ class Office:
                   file=sys.stderr)
             sys.exit(1)
 
-    def find_posix_soffice(self):
+    def __find_posix_soffice(self):
         """Find soffice on POSIX systems (Linux or MacOSX).
 
         Returns:
@@ -583,7 +583,7 @@ class Office:
         # Not found
         return None
 
-    def is_soffice_lo(self, soffice):
+    def __is_soffice_lo(self, soffice):
         """Check whether the soffice executable is LibreOffice.
 
         LibreOffice on POSIX systems accepts "--accept" instead of
