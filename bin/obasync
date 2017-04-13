@@ -477,9 +477,9 @@ class Office:
         self.bootstrap_context = None
         self.service_manager = None
         self.desktop = None
-        self.connect()
+        self.__connect()
 
-    def connect(self):
+    def __connect(self):
         """Connect to the running OpenOffice/LibreOffice process.
 
         Run OpenOffice/LibreOffice in server listening mode if it is
