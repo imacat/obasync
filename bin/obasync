@@ -109,7 +109,7 @@ def append_uno_path():
     if os.path.exists(os.path.join(cand, "uno.py")):
         sys.path.append(cand)
         return
-    # Finds uno.py for MS-Windows
+    # Find uno.py for MS-Windows
     cand = sys.executable
     while cand != os.path.dirname(cand):
         cand = os.path.dirname(cand)
@@ -210,12 +210,12 @@ def parse_args():
         "-v", "--version", action="version", version="%(prog)s 0.4")
     args = parser.parse_args()
 
-    # Obtains the absolute path
+    # Obtain the absolute path
     args.projdir = os.path.abspath(args.projdir)
-    # Obtains the library name from the path
+    # Obtain the library name from the path
     if args.library is None:
         args.library = os.path.basename(args.projdir)
-    # Adjusts the file name extension.
+    # Adjust the file name extension.
     if args.ext[0] != ".":
         args.ext = "." + args.ext
 
@@ -485,14 +485,14 @@ class Office:
         Run OpenOffice/LibreOffice in server listening mode if it is
         not running yet.
         """
-        # Obtains the local context
+        # Obtain the local context
         local_context = uno.getComponentContext()
-        # Obtains the local service manager
+        # Obtain the local service manager
         local_service_manager = local_context.getServiceManager()
-        # Obtains the URL resolver
+        # Obtain the URL resolver
         url_resolver = local_service_manager.createInstanceWithContext(
             "com.sun.star.bridge.UnoUrlResolver", local_context)
-        # Obtains the context
+        # Obtain the context
         url = ("uno:socket,host=localhost,port=%d;"
                "urp;StarOffice.ComponentContext") % self.port
         while True:
@@ -502,9 +502,9 @@ class Office:
                 self.__start_oo()
             else:
                 break
-        # Obtains the service manager
+        # Obtain the service manager
         self.service_manager = self.bootstrap_context.getServiceManager()
-        # Obtains the desktop service
+        # Obtain the desktop service
         self.desktop = self.service_manager.createInstanceWithContext(
             "com.sun.star.frame.Desktop", self.bootstrap_context)
 
@@ -559,7 +559,7 @@ class Office:
         Returns:
             The found soffice executable, or None if not found.
         """
-        # Checkes soffice in the same directory of uno.py
+        # Check soffice in the same directory of uno.py
         # This works for Linux OpenOffice/LibreOffice local
         # installation, and OpenOffice on MacOSX.
         soffice = os.path.join(
@@ -596,7 +596,7 @@ class Office:
         if soffice.lower().find("libreoffice") != -1:
             return True
 
-        # Checks the symbolic link at /usr/bin/soffice
+        # Check the symbolic link at /usr/bin/soffice
         if soffice == "/usr/bin/soffice" and os.path.islink(soffice):
             if os.readlink(soffice).lower().find("libreoffice") != -1:
                 return True
