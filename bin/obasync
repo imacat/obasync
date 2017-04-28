@@ -216,7 +216,7 @@ def parse_args():
         help=("The target storage document if there are more than one"
               " opened documents.  A partial path is OK."))
     parser.add_argument(
-        "-v", "--version", action="version", version="%(prog)s 0.4")
+        "-v", "--version", action="version", version="%(prog)s 0.5")
     args = parser.parse_args()
 
     # Obtain the absolute path
