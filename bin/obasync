@@ -91,7 +91,9 @@ LIBRARY         The name of the Basic library.  Default to the same
 --doc           Store the macros in the document macro storage.
 
 --target TARGET The target storage document if there are more than one
-                opened documents.  A partial path is OK.
+                opened documents.  You may specify a partial path, or
+                as "Untitied 1" (in your language) if it is a new
+                file.
 
 -h, --help      Show the help message and exit
 
@@ -214,7 +216,9 @@ def parse_args():
     parser.add_argument(
         "--target", metavar="TARGET",
         help=("The target storage document if there are more than one"
-              " opened documents.  A partial path is OK."))
+              " opened documents.  You may specify a partial path, or"
+              " an \"Untitied 1\" (in your language) if it is a new"
+              " file."))
     parser.add_argument(
         "-v", "--version", action="version", version="%(prog)s 0.5")
     args = parser.parse_args()

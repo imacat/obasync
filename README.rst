@@ -261,7 +261,9 @@ LIBRARY         The name of the Basic library.  Default to the same
 --doc           Store the macros in the document macro storage.
 
 --target TARGET The target storage document if there are more than one
-                opened documents.  A partial path is OK.
+                opened documents.  You may specify a partial path, or
+                as "Untitied 1" (in your language) if it is a new
+                file.
 
 -h, --help      Show the help message and exit
 
