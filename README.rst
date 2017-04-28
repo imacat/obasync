@@ -256,6 +256,13 @@ LIBRARY         The name of the Basic library.  Default to the same
                 Run he specific macro after synchronization, for
                 convenience.
 
+--user          Store the macros in the user macro storage.  (default)
+
+--doc           Store the macros in the document macro storage.
+
+--target TARGET The target storage document if there are more than one
+                opened documents.  A partial path is OK.
+
 -h, --help      Show the help message and exit
 
 -v, --version   Show program’s version number and exit
@@ -264,7 +271,7 @@ LIBRARY         The name of the Basic library.  Default to the same
 COPYRIGHT
 ---------
 
-  Copyright (c) 2016 imacat.
+  Copyright (c) 2016-2017 imacat.
   
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
