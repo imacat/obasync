@@ -234,9 +234,11 @@ def parse_args():
 
     if args.storage_type is None:
         args.storage_type = "user"
+    # For Python 2 only.
     # Paths are understood locally, despite of the content encoding.
-    if args.target is not None:
-        args.target = args.target.decode(locale.getpreferredencoding())
+    if sys.version_info.major == 2:
+        if args.target is not None:
+            args.target = args.target.decode(locale.getpreferredencoding())
     return
 
 
@@ -296,6 +298,8 @@ def find_doc(oo, target):
         print("ERROR: Found no opened document to store the macros",
               file=sys.stderr)
         sys.exit(1)
+    file_content_provider = oo.service_manager.createInstance(
+        "com.sun.star.ucb.FileContentProvider")
     # There are opened documents.
     if target is None:
         if len(opened) == 1:
@@ -303,9 +307,9 @@ def find_doc(oo, target):
         print("ERROR: There are more than one opened documens."
               "  Please specify the file path.",
               file=sys.stderr)
+        for path in get_doc_paths(opened, file_content_provider):
+            print("* %s" % path, file=sys.stderr)
         sys.exit(1)
-    file_content_provider = oo.service_manager.createInstance(
-        "com.sun.star.ucb.FileContentProvider")
     matched = []
     for doc in opened:
         if doc.hasLocation():
@@ -321,26 +325,38 @@ def find_doc(oo, target):
         print("ERROR: Found no matching document to store the macros.",
               file=sys.stderr)
         print("Opened documents:", file=sys.stderr)
-        for doc in opened:
-            if doc.hasLocation():
-                path = file_content_provider.getSystemPathFromFileURL(
-                    doc.getLocation())
-            else:
-                path = doc.getTitle()
+        for path in get_doc_paths(opened, file_content_provider):
             print("* %s" % path, file=sys.stderr)
         sys.exit(1)
     else:
         print("ERROR: There are more than one matching documents.",
               file=sys.stderr)
         print("Matching documents:", file=sys.stderr)
-        for doc in matched:
-            if doc.hasLocation():
-                path = file_content_provider.getSystemPathFromFileURL(
-                    doc.getLocation())
-            else:
-                path = doc.getTitle()
+        for path in get_doc_paths(matched, file_content_provider):
             print("* %s" % path, file=sys.stderr)
         sys.exit(1)
+
+
+def get_doc_paths(docs, file_content_provider):
+    """Returns the paths (or the titles) of the documents.
+
+    Arguments:
+        docs: A list of office documents.
+        file_content_provider: A FileContentProvider service instance.
+
+    Returns:
+        A list of paths, or the titles if there is no path yet,
+        of the documents.
+    """
+    paths = []
+    for doc in docs:
+        if doc.hasLocation():
+            paths.append(
+                file_content_provider.getSystemPathFromFileURL(
+                doc.getLocation()))
+        else:
+            paths.append(doc.getTitle())
+    return sorted(paths)
 
 
 def read_in_source_dir(projdir, ext, encoding):
