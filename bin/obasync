@@ -230,7 +230,7 @@ def parse_args():
               " an \"Untitied 1\" (in your language) if it is a new"
               " file."))
     parser.add_argument(
-        "-v", "--version", action="version", version="%(prog)s 0.9")
+        "-v", "--version", action="version", version="%(prog)s 0.10")
     args = parser.parse_args()
 
     # Obtain the absolute path

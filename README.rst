@@ -236,6 +236,10 @@ LIBRARY         The name of the Basic library.  Default to the same
                 uploads the source files onto the
                 OpenOffice/LibreOffice Basic storage.
 
+--set-passwd    Sets the password of the library after upload.  Supply
+                nothing when prompting the new password to remove the
+                password protection.  This does not work with --get.
+
 -p, --port N    The TCP port to communicate with
                 OpenOffice/LibreOffice.  The default is 2002.  You can
                 change it if port 2002 is already in use.
