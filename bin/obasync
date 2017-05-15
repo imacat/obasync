@@ -66,6 +66,10 @@ LIBRARY         The name of the Basic library.  Default to the same
                 uploads the source files onto the
                 OpenOffice/LibreOffice Basic storage.
 
+--set-passwd    Sets the password of the library after upload.  Supply
+                nothing when prompting the new password to remove the
+                password protection.  This does not work with --get.
+
 -p, --port N    The TCP port to communicate with
                 OpenOffice/LibreOffice.  The default is 2002.  You can
                 change it if port 2002 is already in use.
@@ -130,6 +134,7 @@ def append_uno_path():
 append_uno_path()
 import uno
 from com.sun.star.connection import NoConnectException
+from com.sun.star.lang import IllegalArgumentException
 
 
 def main():
@@ -163,7 +168,7 @@ def main():
             return
         oo = Office(args.port)
         storage = find_storage(oo, args.storage_type, args.target)
-        update_basic_modules(storage, args.library, modules)
+        update_basic_modules(storage, args.library, modules, args.setpass)
         if args.run is not None:
             run_macro(storage, args.library, args.run)
 
@@ -190,6 +195,10 @@ def parse_args():
     parser.add_argument(
         "--get", action="store_true",
         help="Downloads the macros instead of upload.")
+    parser.add_argument(
+        "--set-passwd", dest="setpass", action="store_true",
+        help=("Sets the password of the library after upload.  "
+              "This does not work with --get."))
     parser.add_argument(
         "-p", "--port", metavar="N", type=int, default=2002,
         help=("The TCP port to communicate with "
@@ -221,7 +230,7 @@ def parse_args():
               " an \"Untitied 1\" (in your language) if it is a new"
               " file."))
     parser.add_argument(
-        "-v", "--version", action="version", version="%(prog)s 0.8")
+        "-v", "--version", action="version", version="%(prog)s 0.9")
     args = parser.parse_args()
 
     # Obtain the absolute path
@@ -240,6 +249,11 @@ def parse_args():
     if sys.version_info.major == 2:
         if args.target is not None:
             args.target = args.target.decode(locale.getpreferredencoding())
+
+    if args.get and args.setpass:
+        print("ERROR: --get does not work with --set-passwd.",
+              file=sys.stderr)
+        sys.exit(1)
     return
 
 
@@ -354,7 +368,7 @@ def get_doc_paths(docs, file_content_provider):
         if doc.hasLocation():
             paths.append(
                 file_content_provider.getSystemPathFromFileURL(
-                doc.getLocation()))
+                    doc.getLocation()))
         else:
             paths.append(doc.getTitle())
     return sorted(paths)
@@ -452,7 +466,7 @@ def read_basic_modules(storage, libname):
     return modules
 
 
-def update_basic_modules(storage, libname, modules):
+def update_basic_modules(storage, libname, modules, setpass):
     """Update the OpenOffice/LibreOffice Basic macro storage.
 
     Arguments:
@@ -466,12 +480,16 @@ def update_basic_modules(storage, libname, modules):
         storage.libs.createLibrary(libname)
         print("Script library %s created." % libname, file=sys.stderr)
         create_dialog_library(storage, libname)
+        if setpass:
+            set_library_password(storage, libname)
         verify_library_password(storage, libname)
         library = storage.libs.getByName(libname)
         for modname in sorted(modules.keys()):
             library.insertByName(modname, modules[modname])
             print("Module %s added." % modname, file=sys.stderr)
     else:
+        if setpass:
+            set_library_password(storage, libname)
         verify_library_password(storage, libname)
         storage.libs.loadLibrary(libname)
         library = storage.libs.getByName(libname)
@@ -524,7 +542,6 @@ def verify_library_password(storage, libname):
     Arguments:
         storage: The Basic macro storage, as a Storage object.
         libname: The name of the dialog library.
-        password: The password for the library.
     """
     if not storage.libs.isLibraryPasswordProtected(libname):
         return
@@ -537,6 +554,57 @@ def verify_library_password(storage, libname):
         print("ERROR: Failed password for library %s." % libname,
               file=sys.stderr)
     return
+
+
+def set_library_password(storage, libname):
+    """Sets the password of the library.
+
+    Arguments:
+        storage: The Basic macro storage, as a Storage object.
+        libname: The name of the dialog library.
+    """
+    if not storage.libs.isLibraryPasswordProtected(libname):
+        while True:
+            newpass = getpass.getpass("New password: ")
+            newpass2 = getpass.getpass("Repeat new password: ")
+            if newpass != newpass2:
+                print("ERROR: Two new passwords are not the same.",
+                      file=sys.stderr)
+                continue
+            else:
+                break
+        storage.libs.changeLibraryPassword(libname, "", newpass)
+        return
+    else:
+        while True:
+            oldpass = getpass.getpass("Old password: ")
+            if oldpass == "":
+                print("ERROR: Please enter the old password.",
+                      file=sys.stderr)
+                continue
+            tmppass = oldpass + "tmp"
+            try:
+                storage.libs.changeLibraryPassword(
+                    libname, oldpass, tmppass)
+            except IllegalArgumentException:
+                print("ERROR: Incorrect old password.",
+                      file=sys.stderr)
+                continue
+            else:
+                storage.libs.changeLibraryPassword(
+                    libname, tmppass, oldpass)
+                break
+        while True:
+            newpass = getpass.getpass("New password: ")
+            newpass2 = getpass.getpass("Repeat new password: ")
+            if newpass != newpass2:
+                print("ERROR: Two new passwords are not the same.",
+                      file=sys.stderr)
+                continue
+            else:
+                break
+        storage.libs.changeLibraryPassword(libname, oldpass, newpass)
+        return
 
 
 def run_macro(storage, libname, macro):
