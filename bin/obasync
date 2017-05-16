@@ -581,6 +581,18 @@ def set_library_password(storage, libname):
                 print("ERROR: Please enter the old password.",
                       file=sys.stderr)
                 continue
+            # There is no easy way to verify the old password.
+            # The verifyLibraryPassword() method does not work when
+            # the password of the library was verified before.
+            # The changeLibraryPassword() method always success
+            # when the old password is the same as the new password.
+            # So I have to change the password to a temporary password
+            # to verify the old password, and then change it back.
+            # This has the risk that if the script crashes between,
+            # the password is changed, and the users do not know how
+            # to get back their password-protected library.
+            # But I suppose the users has the local files as their
+            # source repository.
             tmppass = oldpass + "tmp"
             try:
                 storage.libs.changeLibraryPassword(
