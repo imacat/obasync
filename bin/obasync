@@ -295,11 +295,10 @@ def find_doc(oo, target):
         target: A partial path of the document.
 
     Returns:
-        If there is only one opened document, it is returned.  If
-        there are more than one opened document, the document whose
-        file path matches the "target" is returned.  Otherwise, if
-        no matching document or more than one matching document are
-        found, the program exists with an error.
+        If there is only one opened document that matches the
+        target, it is returned.  If the target is not specified,
+        but there is only one opened document, it is returned.
+        Otherwise, the program exits with an error.
     """
     # Checks the opened documents
     enum = oo.desktop.getComponents().createEnumeration()
