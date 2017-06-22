@@ -274,6 +274,17 @@ LIBRARY         The name of the Basic library.  Default to the same
 -v, --version   Show program’s version number and exit
 
 
+DEMONSTRATION/PRESENTATION
+--------------------------
+
+FOSDEM 2017 - Office Basic Source Code Management
+#################################################
+
+* Summary: https://fosdem.org/2017/schedule/event/office_source_code_mgmt/
+* Presentation: https://www.slideshare.net/imacat/obasync
+* Video: https://www.youtube.com/watch?v=qB1rAAgkYGY
+
+
 COPYRIGHT
 ---------
 
