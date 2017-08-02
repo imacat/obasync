@@ -37,6 +37,13 @@ source files:
 Missing source files will be added, and excess source files will be
 deleted.
 
+Check the presentation_ on how ``obasync`` can be used to manage your
+Office Basic extension projects.
+
+Check `the Pokémon GO IV calculator
+<https://github.com/imacat/pokemongoiv>`_ for an example Office Basic
+extension project that is managed with ``obasync`` and ``git``.
+
 
 INSTALL
 -------
@@ -276,6 +283,8 @@ LIBRARY         The name of the Basic library.  Default to the same
 
 DEMONSTRATION/PRESENTATION
 --------------------------
+
+.. _presentation:
 
 FOSDEM 2017 - Office Basic Source Code Management
 #################################################

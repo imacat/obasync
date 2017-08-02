@@ -1,0 +1,4 @@
+SampleProject - OpenOffice Basic擴充套件專案範本
+版權所有 (c) 2017 依瑪貓
+
+OpenOffice/LibreOffice Basic擴充套件專案範本。
