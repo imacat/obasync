@@ -1,4 +1,0 @@
-SampleProject - A Sample OpenOffice Basic Extension Project Template
-Copyright (c) 2017 imacat 
-
-A Sample OpenOffice/LibreOffice Basic extension project template.
